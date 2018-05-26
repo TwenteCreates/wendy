@@ -24,7 +24,9 @@
   },
   "dependencies": {
     "@oswaldlabs/agastya": "^1.0.2",
+    "firebase": "^5.0.4",
     "offline-plugin": "^5.0.1",
+    "sentence-case": "^2.1.1",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
     "vue-web-cam": "^1.0.4"
