@@ -1,7 +1,7 @@
 <template>
 	<section>
 		<main>
-			<webcam ref="webcam" :width="width" :height="height"></webcam>
+			<webcam ref="webcam" :width="width"></webcam>
 			<transition name="fade" mode="out-in">
 				<article class="login" v-show="login">
 					<p>Touch your finger or enter pin</p>
@@ -39,7 +39,6 @@ export default {
 	data() {
 		return {
 			width: 100,
-			height: 100,
 			bell: false,
 			login: false
 		};
@@ -119,13 +118,17 @@ export default {
 
 
 <style lang="scss" scoped>
+section {
+	background-color: #000;
+}
 video {
 	background-color: #000;
 	position: fixed;
 	left: 0;
 	right: 0;
-	top: 0;
-	bottom: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	height: auto !important;
 	z-index: 1001;
 }
 footer.ring,
