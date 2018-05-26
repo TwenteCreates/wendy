@@ -50,8 +50,18 @@ def get_access_token_if_died():
 def _classify_image():
     global access_token_kpn
     # use the token to classify
+    # parse image and extensions
     body = {
-        
+        "data":[ #list of images with ext
+            {
+                "ext": "jpg",
+                "path": "http://www.babushahi.com/upload/image/Train-Engine_HKM.jpg"
+            },
+            {
+                "ext" : "jpg",
+                "path" : "https://upload.wikimedia.org/wikipedia/commons/0/0e/Atlanta_Zoo_Panda.jpg"
+            }
+        ]
     }
     headers = {
         'Content-Type': 'application/json',
