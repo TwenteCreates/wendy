@@ -35,21 +35,12 @@ def get_access_token_if_died():
     json_resp = json.loads(response.text)
     access_token_kpn = json_resp.get('access_token', "")
 
-def _classify_image():
+def _classify_images(urls):
     global access_token_kpn
     # use the token to classify
     # parse image and extensions
     body = {
-        "data":[ #list of images with ext
-            {
-                "ext": "jpg",
-                "path": "http://www.babushahi.com/upload/image/Train-Engine_HKM.jpg"
-            },
-            {
-                "ext" : "jpg",
-                "path" : "https://upload.wikimedia.org/wikipedia/commons/0/0e/Atlanta_Zoo_Panda.jpg"
-            }
-        ]
+        "data": urls
     }
     headers = {
         'Content-Type': 'application/json',
@@ -61,11 +52,11 @@ def _classify_image():
 
 @app.route("/image-classify", methods=['POST'])
 def image_classifier():
-    image_url = request.values.get('url', None)
-    if not image_url:
+    image_urls = json.loads(request.data).get('urls', None)
+    if not image_urls:
         raise
     get_access_token_if_died()
-    return _classify_image()
+    return _classify_images(image_urls)
 
 @app.route("/")
 def hello():
