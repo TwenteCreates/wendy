@@ -1,0 +1,31 @@
+{
+  "name": "dutch-open-hackathon",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start:dev": "poi",
+    "start:prettier": "onchange '**/*.{js,vue,scss}' -- prettier --write {{changed}}",
+    "build": "poi build"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 4,
+    "useTabs": true
+  },
+  "devDependencies": {
+    "@babel/core": "7.0.0-beta.46",
+    "node-sass": "^4.9.0",
+    "onchange": "^3.3.0",
+    "poi": "^10.1.5",
+    "prettier": "^1.12.1",
+    "sass-loader": "^7.0.1",
+    "sass-npm-import": "^0.0.1"
+  },
+  "dependencies": {
+    "@oswaldlabs/agastya": "^1.0.2",
+    "offline-plugin": "^5.0.1",
+    "vue": "^2.5.16",
+    "vue-router": "^3.0.1"
+  }
+}
