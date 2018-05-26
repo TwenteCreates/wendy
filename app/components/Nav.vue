@@ -8,9 +8,15 @@
 				</router-link>
 			</li>
 			<li>
-				<router-link to="/people">
+				<router-link to="/chat">
 					<div><i class="fas fa-robot"></i></div>
 					<div>Wendy</div>
+				</router-link>
+			</li>
+			<li>
+				<router-link to="/people">
+					<div><i class="fas fa-users"></i></div>
+					<div>People</div>
 				</router-link>
 			</li>
 			<li>

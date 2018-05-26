@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 
+import Chat from "../components/pages/Chat.vue";
 import Bell from "../components/pages/Bell.vue";
 import People from "../components/pages/People.vue";
 import Open from "../components/pages/Open.vue";
@@ -10,6 +11,10 @@ const routes = [
 	{
 		path: "/bell",
 		component: Bell
+	},
+	{
+		path: "/chat",
+		component: Chat
 	},
 	{
 		path: "/people",

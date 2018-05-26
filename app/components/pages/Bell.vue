@@ -97,7 +97,7 @@ export default {
 							const database = firebase.database();
 							database
 								.ref()
-								.child(new Date().getTime())
+								.child(`/rings/${new Date().getTime()}`)
 								.set({
 									url: url,
 									kpn: json.results[0].result
