@@ -111,6 +111,10 @@ def train_image_collection(collection_name):
     return jsonify({})
 
 
+@app.route("check-image-in-collections")
+def check_face_in_collections():
+    pass
+
 @app.route("/")
 def hello():
     return "Hello World!"
@@ -120,12 +124,5 @@ def test_function():
     return "GO to "+get_environmental_variable("HOME")
 
 
-
-
 if __name__ == "__main__":
-    # list_all_images_in_collection()
-    # add_images_to_collection()
-    # list_all_images_in_collection()
-    # test_images()
-    # upload_all_images_to_collection()
     app.run(host='0.0.0.0', port=12000, debug=True)
