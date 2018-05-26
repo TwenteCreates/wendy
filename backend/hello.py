@@ -1,9 +1,17 @@
 from flask import Flask
-
 from flask_cors import CORS
+
+
+import os
 
 app = Flask(__name__)
 cors = CORS(app)
+
+
+def get_environmental_variable(key=None):
+    if not key:
+        raise
+    return os.getenv(key, default=None)
 
 @app.route("/")
 def hello():
