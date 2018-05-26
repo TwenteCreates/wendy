@@ -10,7 +10,7 @@
 			<li>
 				<router-link to="/people">
 					<div><i class="fas fa-robot"></i></div>
-					<div>Ava</div>
+					<div>Wendy</div>
 				</router-link>
 			</li>
 			<li>

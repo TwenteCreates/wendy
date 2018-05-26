@@ -113,7 +113,7 @@ export default {
 						this.botSays(`Everything looks good at home!`);
 					}, 200);
 					setTimeout(() => {
-						this.botSays(`How can I help?`, ["Insurance claim", "Introduction"]);
+						this.botSays(`How can I help?`, ["Security report", "Introduction"]);
 					}, 400);
 				} else {
 					this.options = snapshot.val()[snapshot.val().length - 1].options || [];
@@ -554,6 +554,7 @@ footer {
 button,
 select,
 input {
+	background: none;
 	font: inherit;
 }
 .reply-box {

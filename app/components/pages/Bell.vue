@@ -2,17 +2,22 @@
 	<section>
 		<main>
 			<webcam ref="webcam" :width="width" :height="height"></webcam>
+			<article class="login">
+				<p>Touch your finger or enter pin</p>
+				<img alt="Fingerprint" src="/fingerprint.png">
+			</article>
 		</main>
 		<footer class="ring">
 			<div class="buttons">
 				<button>
 					<i class="fas fa-fw fa-phone fa-flip-horizontal"></i>
 				</button>
-				<button class="big">
-					<i class="fas fa-fw fa-bell"></i>
+				<button class="big" @click.prevent="ring">
+					<i v-if="!bell" class="fas fa-fw fa-bell"></i>
+					<i v-else class="fas fa-fw fa-sync fa-spin"></i>
 				</button>
 				<button>
-					<i class="fas fa-fw fa-microphone"></i>
+					<i class="fas fa-fw fa-lock"></i>
 				</button>
 			</div>
 		</footer>
@@ -26,12 +31,23 @@ export default {
 	data() {
 		return {
 			width: 100,
-			height: 100
+			height: 100,
+			bell: false
 		};
 	},
 	mounted() {
 		this.width = window.innerWidth;
 		this.height = window.innerHeight;
+	},
+	methods: {
+		ring() {
+			const audio = new Audio("/bell.mp3");
+			audio.play();
+			this.bell = true;
+			setTimeout(() => {
+				this.bell = false;
+			}, 2000);
+		}
 	},
 	components: {
 		Webcam
@@ -51,16 +67,31 @@ video {
 	z-index: 1;
 	transform: scale(3);
 }
-footer.ring {
-	position: fixed;
-	bottom: 0;
-	left: -20px;
-	right: -20px;
+footer.ring,
+article.login {
 	box-sizing: border-box;
 	padding: 0 20px;
 	background-color: rgba(100, 100, 100, 0.5);
 	backdrop-filter: blur(15px);
 	z-index: 5;
+	text-align: center;
+	position: fixed;
+	color: #fff;
+}
+footer.ring {
+	bottom: 0;
+	left: -20px;
+	right: -20px;
+}
+article.login {
+	top: 0;
+	left: -20px;
+	right: -20px;
+	padding: 40px;
+	img {
+		margin-top: 1rem;
+		max-width: 20%;
+	}
 }
 .buttons {
 	display: flex;
@@ -73,7 +104,7 @@ footer.ring {
 		font: inherit;
 		font-size: 1.5rem;
 		&.big {
-			font-size: 3rem;
+			font-size: 4rem;
 		}
 	}
 }
