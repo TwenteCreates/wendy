@@ -1,3 +1,7 @@
+# Compiles files
+dist
+build
+
 # Logs
 logs
 *.log

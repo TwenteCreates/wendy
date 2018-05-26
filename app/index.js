@@ -1,6 +1,7 @@
 import Vue from "vue";
 import "./pwa";
 import router from "./modules/router";
+import "whatwg-fetch";
 
 import css from "./app.scss";
 import Nav from "./components/Nav.vue";

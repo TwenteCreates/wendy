@@ -31,6 +31,8 @@
 
 
 <script>
+import firebase from "firebase/app";
+import "firebase/storage";
 import Webcam from "vue-web-cam/src/webcam";
 export default {
 	data() {
@@ -53,6 +55,39 @@ export default {
 			const audio = new Audio("/bell.mp3");
 			audio.play();
 			this.bell = true;
+			const storageRef = firebase.storage().ref(
+				`/people/${Math.random()
+					.toString(36)
+					.slice(2)}.jpg`
+			);
+			let array, binary, i;
+			binary = atob(this.$refs.webcam.capture().split(",")[1]);
+			array = [];
+			i = 0;
+			while (i < binary.length) {
+				array.push(binary.charCodeAt(i));
+				i++;
+			}
+			const picture = new Blob([new Uint8Array(array)], {
+				type: "image/jpeg"
+			});
+			storageRef
+				.put(picture)
+				.then(snapshot => {
+					return snapshot.ref.getDownloadURL();
+				})
+				.then(url => {
+					console.log(url);
+					fetch("", {
+						method: "POST",
+						cors: true
+					})
+						.then(response => response.json())
+						.then(json => {
+							console.log(json);
+						})
+						.catch(error => {});
+				});
 			setTimeout(() => {
 				this.bell = false;
 			}, 2000);
