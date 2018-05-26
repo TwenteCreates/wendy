@@ -1,3 +1,10 @@
 <template>
-	<div>Page</div>
+	<section>
+		<header>
+			404
+		</header>
+		<main>
+			404
+		</main>
+	</section>
 </template>

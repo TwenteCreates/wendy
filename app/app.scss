@@ -1,10 +1,8 @@
-@import "./modules/scss/sanitize";
-
-// Global styles
-
 body {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
 		"Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+	background-color: #f3f6f7;
+	line-height: 1.4;
 }
 
 img {
@@ -24,4 +22,65 @@ p:last-child {
 .fade-enter,
 .fade-leave-to {
 	opacity: 0;
+}
+
+button {
+	// This isn't good, I know.
+	// But it's for mobile users, who don't focus on buttons
+	outline: none;
+}
+
+// Layout
+
+.app-container {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+section {
+	display: flex;
+	flex: 1 0 0;
+	flex-direction: column;
+}
+
+header {
+	font-size: 110%;
+	padding: 1rem 0;
+	font-weight: 600;
+	text-align: center;
+	box-shadow: 0 0.5rem 1rem rgba(0, 100, 100, 0.1);
+	z-index: 2000;
+	background-color: #fff;
+}
+
+main {
+	flex: 1 0 0;
+	overflow: auto;
+}
+
+footer {
+	background-color: #fff;
+}
+
+.animator {
+	background-color: #5352ed;
+	color: #fff;
+	border: none;
+	padding: 0.75rem 1rem;
+	border-radius: 25px;
+	position: absolute;
+	display: inline-block;
+	z-index: 2000;
+	opacity: 0;
+	left: 0;
+	top: 0;
+}
+
+#abc9c1elt_ib {
+	display: none !important;
 }
