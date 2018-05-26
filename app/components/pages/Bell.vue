@@ -33,6 +33,7 @@
 <script>
 import firebase from "firebase/app";
 import "firebase/storage";
+import "firebase/database";
 import Webcam from "vue-web-cam/src/webcam";
 export default {
 	data() {
@@ -77,20 +78,37 @@ export default {
 					return snapshot.ref.getDownloadURL();
 				})
 				.then(url => {
-					console.log(url);
-					fetch("", {
-						method: "POST",
-						cors: true
-					})
+					fetch(
+						"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/image-classify",
+						{
+							method: "POST",
+							cors: true,
+							body: JSON.stringify({
+								urls: [
+									{
+										ext: "jpg",
+										path: url
+									}
+								]
+							})
+						}
+					)
 						.then(response => response.json())
 						.then(json => {
-							console.log(json);
+							const database = firebase.database();
+							database
+								.ref()
+								.child(new Date().getTime())
+								.set({
+									url: url,
+									kpn: json.results[0].result
+								});
+							this.bell = false;
 						})
-						.catch(error => {});
+						.catch(() => {
+							this.bell = false;
+						});
 				});
-			setTimeout(() => {
-				this.bell = false;
-			}, 2000);
 		}
 	},
 	components: {
@@ -108,8 +126,7 @@ video {
 	right: 0;
 	top: 0;
 	bottom: 0;
-	z-index: 1;
-	transform: scale(3);
+	z-index: 1001;
 }
 footer.ring,
 article.login {
@@ -117,7 +134,7 @@ article.login {
 	padding: 0 20px;
 	background-color: rgba(100, 100, 100, 0.5);
 	backdrop-filter: blur(15px);
-	z-index: 5;
+	z-index: 1005;
 	text-align: center;
 	position: fixed;
 	color: #fff;
@@ -169,11 +186,5 @@ article.login {
 		display: block;
 		clear: both;
 	}
-}
-</style>
-
-<style>
-.navbar {
-	display: none;
 }
 </style>
