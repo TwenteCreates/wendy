@@ -1,15 +1,17 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 
+import Bell from "../components/pages/Bell.vue";
 import Error404 from "../components/pages/Error404.vue";
 
 const routes = [
 	{
+		path: "/bell",
+		component: Bell
+	},
+	{
 		path: "*",
-		component: Error404,
-		meta: {
-			title: "404 Error"
-		}
+		component: Error404
 	}
 ];
 

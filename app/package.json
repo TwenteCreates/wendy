@@ -26,6 +26,7 @@
     "@oswaldlabs/agastya": "^1.0.2",
     "offline-plugin": "^5.0.1",
     "vue": "^2.5.16",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vue-web-cam": "^1.0.4"
   }
 }

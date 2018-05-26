@@ -3,7 +3,7 @@ const sass = require("node-sass");
 const moduleImporter = require("sass-npm-import");
 
 module.exports = options => ({
-	entry: "./src/index.js",
+	entry: "./index.js",
 	babel: {
 		jsx: "vue"
 	},
@@ -13,13 +13,13 @@ module.exports = options => ({
 		}
 		sass.render(
 			{
-				file: "./src/app.scss",
+				file: "./app.scss",
 				importer: moduleImporter()
 			},
 			() => {}
 		);
 	},
 	html: {
-		template: "./src/template.ejs"
+		template: "./template.ejs"
 	}
 });
