@@ -2,10 +2,15 @@
 	<section>
 		<main>
 			<webcam ref="webcam" :width="width" :height="height"></webcam>
-			<article class="login">
-				<p>Touch your finger or enter pin</p>
-				<img alt="Fingerprint" src="/fingerprint.png">
-			</article>
+			<transition name="fade" mode="out-in">
+				<article class="login" v-show="login">
+					<p>Touch your finger or enter pin</p>
+					<img alt="Fingerprint" src="/fingerprint.png">
+					<div class="pin">
+						<button v-for="n in [1, 2, 3, 4, 5, 6, 7, 8, 9, ' ', 0]" :key="`button${n}`">{{ n }}</button>
+					</div>
+				</article>
+			</transition>
 		</main>
 		<footer class="ring">
 			<div class="buttons">
@@ -16,7 +21,7 @@
 					<i v-if="!bell" class="fas fa-fw fa-bell"></i>
 					<i v-else class="fas fa-fw fa-sync fa-spin"></i>
 				</button>
-				<button>
+				<button @click.prevent="openLogin">
 					<i class="fas fa-fw fa-lock"></i>
 				</button>
 			</div>
@@ -32,7 +37,8 @@ export default {
 		return {
 			width: 100,
 			height: 100,
-			bell: false
+			bell: false,
+			login: false
 		};
 	},
 	mounted() {
@@ -40,6 +46,9 @@ export default {
 		this.height = window.innerHeight;
 	},
 	methods: {
+		openLogin() {
+			this.login = !this.login;
+		},
 		ring() {
 			const audio = new Audio("/bell.mp3");
 			audio.play();
@@ -90,7 +99,7 @@ article.login {
 	padding: 40px;
 	img {
 		margin-top: 1rem;
-		max-width: 20%;
+		max-width: 15%;
 	}
 }
 .buttons {
@@ -106,6 +115,24 @@ article.login {
 		&.big {
 			font-size: 4rem;
 		}
+	}
+}
+.pin {
+	margin-top: 2rem;
+	button {
+		border: none;
+		background: none;
+		width: 33%;
+		float: left;
+		font: inherit;
+		color: #fff;
+		font-size: 1.75rem;
+		padding: 0.5rem 0;
+	}
+	&::after {
+		content: "";
+		display: block;
+		clear: both;
 	}
 }
 </style>

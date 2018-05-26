@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 
 import Bell from "../components/pages/Bell.vue";
 import People from "../components/pages/People.vue";
+import Open from "../components/pages/Open.vue";
 import Error404 from "../components/pages/Error404.vue";
 
 const routes = [
@@ -13,6 +14,10 @@ const routes = [
 	{
 		path: "/people",
 		component: People
+	},
+	{
+		path: "/open",
+		component: Open
 	},
 	{
 		path: "*",
