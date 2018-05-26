@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import firebase from "firebase";
+import firebase from "firebase/app";
 import sentenceCase from "sentence-case";
 firebase.initializeApp({
 	apiKey: "AIzaSyDZGcrdh48alSZlUoiQSpXP0fktcVPJf2w",
@@ -89,6 +89,7 @@ firebase.initializeApp({
 	storageBucket: "talanx-hack.appspot.com",
 	messagingSenderId: "784808067653"
 });
+import "firebase/database";
 const database = firebase.database();
 function getOffset(el) {
 	var _x = 0;

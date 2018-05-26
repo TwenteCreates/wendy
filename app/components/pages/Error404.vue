@@ -1,6 +1,10 @@
 <template>
-	<div>
-		<i class="fas fa-exclamation-triangle"></i>
-		<p>Coming soon</p>
-	</div>
+	<section>
+		<header>
+			404
+		</header>
+		<main>
+			404
+		</main>
+	</section>
 </template>
