@@ -18,8 +18,8 @@ def hello():
     return "Hello World!"
 
 @app.route("/bye")
-def bye():
-    return "bye World!"
+def test_function():
+    return "GO to "+get_environmental_variable("HOME")
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=12000)
