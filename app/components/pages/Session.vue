@@ -12,18 +12,18 @@
 				<div class="img" :style="`background: url('${session.url}') center center / cover no-repeat`"></div>
 				<div class="griddy">
 					<div>
-						<div><strong>Anand Chowdhary</strong></div>
+						<div><strong>{{session.name || "Unknown name"}}</strong></div>
 						<div class="light">{{format(id)}}</div>
 					</div>
 				</div>
 			</div>
 			<h2 class="subtitle">Labels</h2>
-			<div class="item" v-for="(classification, id) in session.kpn" :key="`classification${id}`" v-if="classification.score > 0.1">
+			<div class="item" v-for="(classification, id) in session.kpn" :key="`classification${id}`" v-if="id < 3">
 				<div class="griddy">
 					<div class="img" :style="`background: url('https://tse2.mm.bing.net/th?q=${classification.classification}&w=400&h=300&p=0&dpr=2&adlt=moderate&c=1') center center / cover no-repeat`"></div>
 					<div>
 						<div><strong>{{sentenceCase(classification.classification)}}</strong></div>
-						<div class="light">{{parseInt(classification.score * 100)}}%</div>
+						<div class="light">{{parseInt(classification.score * 100)}}% confidence</div>
 					</div>
 				</div>
 			</div>

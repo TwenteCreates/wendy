@@ -105,15 +105,43 @@ export default {
 					)
 						.then(response => response.json())
 						.then(json => {
-							const database = firebase.database();
-							database
-								.ref()
-								.child(`/rings/${new Date().getTime()}`)
-								.set({
-									url: url,
-									kpn: json.results[0].result
+							fetch(
+								"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/check-image-in-collections",
+								{
+									method: "POST",
+									headers: {
+										"content-type": "application/json"
+									},
+									body: JSON.stringify({
+										url: url
+									})
+								}
+							)
+								.then(response2 => response2.json())
+								.then(json2 => {
+									const database = firebase.database();
+									database
+										.ref()
+										.child(`/rings/${new Date().getTime()}`)
+										.set({
+											url: url,
+											name: json2.name,
+											userData: json2.userData,
+											kpn: json.results[0].result
+										});
+									this.bell = false;
+								})
+								.catch(() => {
+									const database = firebase.database();
+									database
+										.ref()
+										.child(`/rings/${new Date().getTime()}`)
+										.set({
+											url: url,
+											kpn: json.results[0].result
+										});
+									this.bell = false;
 								});
-							this.bell = false;
 						})
 						.catch(() => {
 							this.bell = false;
