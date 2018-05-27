@@ -85,6 +85,8 @@ import "../../modules/firebase";
 import firebase from "firebase";
 import sentenceCase from "sentence-case";
 const database = firebase.database();
+let lastImage = null;
+let recentlyDone = false;
 function getOffset(el) {
 	var _x = 0;
 	var _y = 0;
@@ -133,28 +135,30 @@ export default {
 						Object.keys(snapshot.val().rings).length !== 1 &&
 						Object.keys(snapshot.val().rings).length -
 							Object.keys(this.people).length ==
-							1
+							1 &&
+						!recentlyDone
 					) {
 						this.people = snapshot.val().rings;
-						setTimeout(() => {
+						const currPersonId = Object.keys(this.people)[
+							Object.keys(this.people).length - 1
+						];
+						if (this.people[currPersonId].userData) {
+							this.botSays(`${this.people[currPersonId].name} is home.`);
+						} else {
+							recentlyDone = true;
+							setTimeout(() => {
+								recentlyDone = false;
+							}, 1000);
 							this.botSays(`There's someone at the door.`);
 							this.botSays(`It's not in your trusted contacts.`);
-							this.botSays(
-								"IMAGE_URL|" +
-									this.people[
-										Object.keys(this.people)[
-											Object.keys(this.people).length - 1
-										]
-									].url
-							);
-						}, 200);
-						setTimeout(() => {
+							this.botSays("IMAGE_URL|" + this.people[currPersonId].url);
+							lastImage = currPersonId;
 							this.botSays(`What do you want to do?`, [
 								"Unlock door",
 								"Ignore",
 								"Start call"
 							]);
-						}, 400);
+						}
 					}
 				}
 				if (
@@ -166,7 +170,6 @@ export default {
 						!!snapshot.val().conversation[snapshot.val().conversation.length - 1]
 							.botShould
 					) {
-						console.log("botShould");
 						this.respond(
 							snapshot.val().conversation[snapshot.val().conversation.length - 1].text
 						)
@@ -203,7 +206,8 @@ export default {
 			nextMessages: [],
 			currentQ: null,
 			bossHasJoined: false,
-			people: []
+			people: [],
+			contexts: null
 		};
 	},
 	methods: {
@@ -408,6 +412,7 @@ export default {
 				},
 				body: JSON.stringify({
 					query: reply,
+					contexts: this.contexts,
 					lang: "en",
 					sessionId: Math.random()
 						.toString(36)
@@ -419,7 +424,11 @@ export default {
 					try {
 						const answer = json.result.speech;
 						this.botSays(answer || "😊");
-						if (answer === "Okay, I have unlocked the door.") {
+						if (
+							answer ===
+							"Okay, I have unlocked the door. Do you want me to to add to your trusted list?"
+						) {
+							this.contexts = ["door-unlock-followup"];
 							firebase
 								.database()
 								.ref(`/`)
@@ -434,8 +443,43 @@ export default {
 										access: false
 									});
 							}, 10000);
+						} else if (
+							answer === "Okay, great. I'll let them in next time. What's their name?"
+						) {
+							this.contexts = ["door-unlock-yes-followup"];
 						} else if (answer === "Here's the list of people.") {
 							this.$router.push("/people");
+						} else if (this.contexts[0] === "door-unlock-yes-followup") {
+							const name = json.result.resolvedQuery;
+							console.log(lastImage);
+							if (lastImage) {
+								firebase
+									.database()
+									.ref(`/rings/${lastImage}`)
+									.update({
+										name: name,
+										userData: "trusted"
+									});
+								fetch(
+									"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/add-image-to-collection/final",
+									{
+										method: "POST",
+										headers: {
+											"content-type": "application/json"
+										},
+										body: JSON.stringify({
+											url: this.people[lastImage].url,
+											name: name,
+											userData: "trusted"
+										})
+									}
+								).then(() => {
+									fetch(
+										"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/train-collection/final"
+									);
+									this.botSays("Done!");
+								});
+							}
 						}
 					} catch (error) {}
 				})
