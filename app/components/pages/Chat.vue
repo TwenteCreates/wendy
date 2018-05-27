@@ -401,7 +401,7 @@ export default {
 					});
 					if (voices.length > 0) {
 						clearInterval(a);
-						// window.speechSynthesis.speak(utterThis);
+						window.speechSynthesis.speak(utterThis);
 					}
 				}, 10);
 				setTimeout(() => {
