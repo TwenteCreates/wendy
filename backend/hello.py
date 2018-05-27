@@ -68,7 +68,7 @@ def image_classifier():
 def make_microsoft_face_api_request(suffix, request_type, collection_id, payload):
     url = MICROSOFT_ENDPOINT_URL + '/' + suffix
     headers = {
-        'ocp-apim-subscription-key': "c9f4b9a5d14a4083af48fe563521edc4",
+        'ocp-apim-subscription-key': microsoft_cognitive_secret,
         'content-type': "application/json",
     }
 
@@ -83,9 +83,9 @@ def get_collection_id(collection_name):
         collection_id = 0
     return collection_id
 
-@app.route("/create-image-collection/<collection_name>")
+@app.route("/create-collection/<collection_name>")
 def create_image_collection(collection_name):
-    suffix = 'largepersongroups/%s' %(get_collection_id(collection_name))
+    suffix = 'persongroups/%s' %(get_collection_id(collection_name))
     payload = json.dumps({"name":collection_name})
     request_type = 'PUT'
     response = make_microsoft_face_api_request(suffix, request_type, get_collection_id(collection_name), payload)
@@ -94,9 +94,9 @@ def create_image_collection(collection_name):
     else:
         raise
 
-@app.route("/delete-image-collection/<collection_name>")
+@app.route("/delete-collection/<collection_name>")
 def delete_image_collection(collection_name):
-    suffix = 'largepersongroups/%s' % (get_collection_id(collection_name))
+    suffix = 'persongroups/%s' % (get_collection_id(collection_name))
     payload = ''
     request_type = 'DELETE'
     response = make_microsoft_face_api_request(suffix, request_type, get_collection_id(collection_name), payload)
@@ -105,15 +105,80 @@ def delete_image_collection(collection_name):
     else:
         raise
 
-@app.route("/train-image-to-collection/<collection_name>")
+@app.route("/train-collection/<collection_name>")
 def train_image_collection(collection_name):
-    get_collection_id(collection_name)
+    # get_collection_id(collection_name)
+    suffix = 'persongroups/%s/train' % (get_collection_id(collection_name))
+    request_type='POST'
+    payload = ''
+    make_microsoft_face_api_request(suffix, request_type, get_collection_id(collection_name), payload)
     return jsonify({})
 
+@app.route("/training-status-collection/<collection_name>")
+def training_status_collection(collection_name):
+    # get_collection_id(collection_name)
+    payload = ''
+    suffix = 'persongroups/%s/training' % (get_collection_id(collection_name))
+    request_type='GET'
+    response = make_microsoft_face_api_request(suffix, request_type, get_collection_id(collection_name), payload)
+    if response.status_code == 200:
+        return jsonify({})
+    else:
+        raise
 
-@app.route("check-image-in-collections")
+@app.route("/add-image-to-collection/<collection_name>", methods=['POST'])
+def add_image_to_collection(collection_name):
+    collection_id = get_collection_id(collection_name)
+    #1. add person : https://[location].api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}/persons
+    suffix = "persongroups/%s/persons" %(collection_id)
+    import random, string
+    #TODO: can put name and userdata
+    req_json = json.loads(request.data)
+    name = req_json.get("name", ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6)))
+    userdata = req_json.get("userData", '')
+    request_type='POST'
+    payload = json.dumps({"name":name, "userData":userdata})
+    response = make_microsoft_face_api_request(suffix, request_type, collection_id, payload)
+    person_id = response.json()['personId']
+
+    #2. add image to that person:
+    suffix = "persongroups/%s/persons/%s/persistedFaces" %(collection_id, person_id)
+    url = req_json.get("url")
+    payload = json.dumps({"url": url})
+    response = make_microsoft_face_api_request(suffix, request_type, collection_id, payload)
+    return jsonify(response.text)
+
+
+@app.route("/check-image-in-collections", methods=['POST'])
 def check_face_in_collections():
-    pass
+    #1. detect face(you will get faceid)
+
+    suffix = "detect?returnFaceId=true"
+    request_type = 'POST'
+    req_json = json.loads(request.data)
+    url = req_json.get("url") #"https://i.dawn.com/large/2018/02/5a8bf2139739e.png"
+    payload = json.dumps({"url": url})
+    response = make_microsoft_face_api_request(suffix, request_type, 0, payload)
+    face_id = response.json()[0].get('faceId')
+    face_id_array = [face_id]
+
+    #2. identify face
+    suffix = "identify"
+    request_type = 'POST'
+    payload = json.dumps({
+        "personGroupId": "0",
+        "faceIds": face_id_array,
+        "maxNumOfCandidatesReturned": 1,
+    })
+    response = make_microsoft_face_api_request(suffix, request_type, 0, payload)
+    person_id = response.json()[0].get("candidates")[0].get('personId')
+
+    #3. get person info
+    suffix = "persongroups/%s/persons/%s" %("0", person_id)
+    request_type = 'GET'
+    payload = ''
+    response = make_microsoft_face_api_request(suffix, request_type, 0, payload)
+    return jsonify(response.json())
 
 @app.route("/")
 def hello():
