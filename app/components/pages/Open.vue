@@ -11,7 +11,7 @@ export default {
 	mounted() {
 		setTimeout(() => {
 			this.$router.push("/bell");
-		}, 10000);
+		}, 5000);
 	}
 };
 </script>

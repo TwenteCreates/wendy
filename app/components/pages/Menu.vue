@@ -2,9 +2,16 @@
 	<section>
 		<header>
 			Menu
+			<i v-if="loading" class="fas fa-sync fa-spin"></i>
 		</header>
 		<main>
 			<ul>
+				<li>
+					<button @click="deleteEverything">
+						<i class="fas fa-fw fa-trash"></i>
+						Delete all my data
+					</button>
+				</li>
 				<li>
 					<a target="_blank" href="https://github.com/AnandChowdhary/dutch-open-hack">
 						<i class="fab fa-fw fa-github"></i>
@@ -21,25 +28,25 @@
 					</button>
 				</li>
 				<li>
-					<button @click="clearClassifier">
+					<button @click="loadMissingPersons">
 						<i class="fas fa-fw fa-user-times"></i>
 						Load Missing Persons data
 					</button>
 				</li>
 				<li>
-					<button @click="clearClassifier">
+					<button @click="loadWantedPersons">
 						<i class="fas fa-fw fa-user-ninja"></i>
 						Load Wanted Persons data
 					</button>
 				</li>
 				<li>
-					<button @click="clearClassifier">
+					<button @click="trainClassifier">
 						<i class="fas fa-fw fa-robot"></i>
 						Retrain classifier data
 					</button>
 				</li>
 				<li>
-					<button @click="clearClassifier">
+					<button @click="sendSms">
 						<i class="fas fa-fw fa-envelope"></i>
 						Send sample SMS
 					</button>
@@ -56,9 +63,136 @@
 </template>
 
 <script>
+import "../../modules/firebase";
+import firebase from "firebase";
+const database = firebase.database();
 export default {
+	data() {
+		return {
+			loading: false
+		};
+	},
 	methods: {
-		clearClassifier() {}
+		deleteEverything() {
+			this.loading = true;
+			fetch(
+				"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/delete-collection/final"
+			)
+				.then(() => {})
+				.catch(() => {})
+				.then(() => {
+					fetch(
+						"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/create-collection/final"
+					)
+						.then(() => {})
+						.catch(() => {})
+						.then(() => {
+							const messages = firebase.database().ref("/");
+							messages.once("value").then(snapshot => {
+								if (snapshot.val()) {
+									const people = snapshot.val().rings || {};
+									for (let image in people) {
+										const url = people[image].url
+											.replace(
+												"https://firebasestorage.googleapis.com/v0/b/talanx-hack.appspot.com/o/people%2F",
+												""
+											)
+											.split("?alt=media")[0];
+										const imageReference = firebase
+											.storage()
+											.ref("/")
+											.child(`people/${url}`);
+										imageReference
+											.delete()
+											.then(() => {
+												console.log("deleted");
+											})
+											.catch(function(error) {});
+										firebase
+											.database()
+											.ref("/")
+											.set({});
+									}
+								}
+							});
+							this.loading = false;
+						});
+				});
+		},
+		clearClassifier() {
+			this.loading = true;
+			fetch(
+				"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/delete-collection/final"
+			)
+				.then(() => {})
+				.catch(() => {})
+				.then(() => {
+					fetch(
+						"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/create-collection/final"
+					)
+						.then(() => {})
+						.catch(() => {})
+						.then(() => {
+							this.loading = false;
+						});
+				});
+		},
+		loadMissingPersons() {
+			this.loading = true;
+			fetch(
+				"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/load-missing-person-data/final"
+			)
+				.then(() => {})
+				.catch(() => {})
+				.then(() => {
+					this.loading = false;
+				});
+		},
+		loadWantedPersons() {
+			this.loading = true;
+			fetch(
+				"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/load-fugitive-person-data/final"
+			)
+				.then(() => {})
+				.catch(() => {})
+				.then(() => {
+					this.loading = false;
+				});
+		},
+		trainClassifier() {
+			this.loading = true;
+			fetch(
+				"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/train-collection/final"
+			)
+				.then(() => {})
+				.catch(() => {})
+				.then(() => {
+					this.loading = false;
+				});
+		},
+		sendSms() {
+			this.loading = true;
+			fetch("https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/send-sms", {
+				method: "POST",
+				headers: {
+					"content-type": "application/json"
+				},
+				body: JSON.stringify({
+					messages: [
+						{
+							content: "Sample message from Wendy",
+							mobile_number: "0644691056"
+						}
+					],
+					sender: "Wendy"
+				})
+			})
+				.then(() => {})
+				.catch(() => {})
+				.then(() => {
+					this.loading = false;
+				});
+		}
 	}
 };
 </script>
@@ -100,5 +234,10 @@ ul {
 }
 h2 {
 	margin-left: 1rem;
+}
+header .fa-sync {
+	position: absolute;
+	top: 1.2rem;
+	right: 1rem;
 }
 </style>

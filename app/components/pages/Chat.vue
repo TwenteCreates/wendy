@@ -143,7 +143,11 @@ export default {
 							Object.keys(this.people).length - 1
 						];
 						if (this.people[currPersonId].userData) {
-							this.botSays(`${this.people[currPersonId].name} is home.`);
+							this.botSays(
+								`Hey, just to keep you posted: ${
+									this.people[currPersonId].name
+								} is home.`
+							);
 						} else {
 							recentlyDone = true;
 							setTimeout(() => {
@@ -364,9 +368,50 @@ export default {
 			this.reply = "";
 			if (!reply || !reply.trim()) return;
 			if (reply.toLowerCase() === "clear") {
-				this.messages = [];
-				this.saveMessages();
-				database.ref(`/data`).set({});
+				fetch(
+					"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/delete-collection/final"
+				)
+					.then(() => {})
+					.catch(() => {})
+					.then(() => {
+						fetch(
+							"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/create-collection/final"
+						)
+							.then(() => {})
+							.catch(() => {})
+							.then(() => {
+								const messages = firebase.database().ref("/");
+								messages.once("value").then(snapshot => {
+									if (snapshot.val()) {
+										const people = snapshot.val().rings || {};
+										for (let image in people) {
+											const url = people[image].url
+												.replace(
+													"https://firebasestorage.googleapis.com/v0/b/talanx-hack.appspot.com/o/people%2F",
+													""
+												)
+												.split("?alt=media")[0];
+											const imageReference = firebase
+												.storage()
+												.ref("/")
+												.child(`people/${url}`);
+											imageReference
+												.delete()
+												.then(() => {
+													console.log("deleted");
+												})
+												.catch(function(error) {});
+											firebase
+												.database()
+												.ref("/")
+												.set({});
+											location.reload();
+										}
+									}
+								});
+							});
+					});
+
 				location.reload();
 				return;
 			}
