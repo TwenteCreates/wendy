@@ -142,12 +142,26 @@ export default {
 						const currPersonId = Object.keys(this.people)[
 							Object.keys(this.people).length - 1
 						];
-						if (this.people[currPersonId].userData) {
-							this.botSays(
-								`Hey, just to keep you posted: ${
-									this.people[currPersonId].name
-								} is home.`
-							);
+						const userD = this.people[currPersonId].userData;
+						if (userD) {
+							if (userD === "trusted") {
+								this.botSays(
+									`Hey, just to keep you posted: ${
+										this.people[currPersonId].name
+									} just entered your house.`
+								);
+							} else if (userD === "missing") {
+								this.botSays(
+									`Important: I think I've found a missing person on your street. I'm sending a message to the authorities.`
+								);
+							} else if (userD === "wanted") {
+								this.botSays(
+									`VERY IMPORTANT: I think I've found a wanted person on your street. I'm sending an emergency message to the authorities. Please don't go near the door of your house.`
+								);
+								this.botSays(
+									`I'm also sending a message to your trusted contacts, warning them to not come to this street for the next few hours.`
+								);
+							}
 						} else {
 							recentlyDone = true;
 							setTimeout(() => {
