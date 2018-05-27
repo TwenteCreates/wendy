@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 import Chat from "../components/pages/Chat.vue";
 import Bell from "../components/pages/Bell.vue";
 import People from "../components/pages/People.vue";
+import Session from "../components/pages/Session.vue";
 import Open from "../components/pages/Open.vue";
 import Error404 from "../components/pages/Error404.vue";
 
@@ -19,6 +20,10 @@ const routes = [
 	{
 		path: "/people",
 		component: People
+	},
+	{
+		path: "/session/:id",
+		component: Session
 	},
 	{
 		path: "/open",

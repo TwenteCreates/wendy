@@ -86,3 +86,24 @@ footer {
 #abc9c1elt_ib {
 	display: none !important;
 }
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+h2.subtitle {
+	font-size: 100%;
+	text-transform: uppercase;
+	margin-top: 0;
+	color: rgba(0, 0, 0, 0.5);
+}
+
+* + h2.subtitle {
+	margin-top: 2rem;
+}
+
+.back-button {
+	position: absolute;
+	left: 1rem;
+}

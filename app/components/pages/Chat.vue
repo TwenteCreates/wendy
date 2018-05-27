@@ -85,6 +85,7 @@ import "../../modules/firebase";
 import firebase from "firebase";
 import sentenceCase from "sentence-case";
 const database = firebase.database();
+let recentlyDone = false;
 function getOffset(el) {
 	var _x = 0;
 	var _y = 0;
@@ -133,9 +134,15 @@ export default {
 						Object.keys(snapshot.val().rings).length !== 1 &&
 						Object.keys(snapshot.val().rings).length -
 							Object.keys(this.people).length ==
-							1
+							1 &&
+						!recentlyDone
 					) {
 						this.people = snapshot.val().rings;
+						console.log(this.people, Object.keys(snapshot.val().rings));
+						recentlyDone = true;
+						setTimeout(() => {
+							recentlyDone = false;
+						}, 1000);
 						setTimeout(() => {
 							this.botSays(`There's someone at the door.`);
 							this.botSays(`It's not in your trusted contacts.`);

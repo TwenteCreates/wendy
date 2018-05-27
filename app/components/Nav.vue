@@ -9,7 +9,7 @@
 			</li>
 			<li>
 				<router-link to="/chat">
-					<div><i class="fas fa-robot"></i></div>
+					<div><i class="fas fa-comments"></i></div>
 					<div>Wendy</div>
 				</router-link>
 			</li>

@@ -14,8 +14,13 @@
 				</div>
 				<footer>
 					<div>
-						<i class="fas fa-check-circle"></i>Safe
+						<i class="fas fa-check-circle"></i>
+						Trusted
 					</div>
+					<router-link :to="`/session/${id}`">
+						<i class="fas fa-info-circle"></i>
+						Details
+					</router-link>
 				</footer>
 			</div>
 		</main>
@@ -70,6 +75,10 @@ main {
 	}
 	footer {
 		margin-top: 0.75rem;
+		justify-content: space-between;
+		i {
+			margin-right: 0.5rem;
+		}
 	}
 	margin-bottom: 1rem;
 	.img {
@@ -85,6 +94,5 @@ main {
 }
 i.fa-check-circle {
 	color: #2ecc71;
-	margin-right: 0.5rem;
 }
 </style>
