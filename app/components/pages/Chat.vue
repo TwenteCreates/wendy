@@ -161,6 +161,44 @@ export default {
 								this.botSays(
 									`I'm also sending a message to your trusted contacts, warning them to not come to this street for the next few hours.`
 								);
+								fetch(
+									"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/send-sms",
+									{
+										method: "POST",
+										headers: {
+											"content-type": "application/json"
+										},
+										body: JSON.stringify({
+											messages: [
+												{
+													content:
+														"VERY IMPORTANT: These is a wanted person on on Steve's street. I have sent an emergency message to the authorities. Please don't go near the street for the next few hours.",
+													mobile_number: "0644691056"
+												}
+											],
+											sender: "Wendy"
+										})
+									}
+								);
+								fetch(
+									"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/send-sms",
+									{
+										method: "POST",
+										headers: {
+											"content-type": "application/json"
+										},
+										body: JSON.stringify({
+											messages: [
+												{
+													content:
+														"EMERGENCY: Someone looking like WANTED FUGITIVE 9RJ03I131 (29/male) was seen on 37 Bleiswijkseweg, 2712PB Zoetermeer. Requesting immediate assistance.",
+													mobile_number: "0644691056"
+												}
+											],
+											sender: "Wendy"
+										})
+									}
+								);
 							}
 						} else {
 							recentlyDone = true;
