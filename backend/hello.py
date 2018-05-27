@@ -238,7 +238,7 @@ def load_missing_person_data(collection_name):
     for missing_person in missing_persons:
         name = missing_person.get('titel')
         url = missing_person.get('afbeeldingen')[0].get('url')
-        _add_image_to_collection(collection_name, name, json.dumps(missing_person), url)
+        _add_image_to_collection(collection_name, name, 'missing', url)
     return jsonify({})
 
 @app.route("/load-fugitive-person-data/<collection_name>")
@@ -253,7 +253,7 @@ def load_fugitive_person_data(collection_name):
     for fugitive_person in fugitive_persons:
         name = fugitive_person.get('titel')
         url = fugitive_person.get('afbeeldingen')[0].get('url')
-        response = _add_image_to_collection(collection_name, name, json.dumps(fugitive_person), url)
+        response = _add_image_to_collection(collection_name, name, 'wanted', url)
         print response
     return jsonify({})
 
