@@ -1,7 +1,7 @@
 <template>
 	<section>
 		<header>
-			Hello
+			<img alt="Wendy" src="/text.png">
 		</header>
 		<main class="main-chat">
 			<div v-for="(message, index) in messages" :key="`message${index}`" v-bind:class="`message-block ${message.sender} next-${message.next || 'none'} previous-${message.previous || 'none'} class-${message.class || 'none'}`">
@@ -12,8 +12,7 @@
 					<div class="message">
 						<div class="message-inner" v-if="!message.text.includes(`IMAGE_URL|`)">{{message.text}}</div>
 						<div class="message-inner inline-image" v-else>
-							<div v-if="imageUrl"><img alt="Uploaded image" :src="imageUrl"></div>
-							<div v-else><i class="fas fa-sync fa-spin"></i> &nbsp;Loading...</div>
+							<img alt="Uploaded image" :src="message.text.replace(`IMAGE_URL|`, ``)">
 						</div>
 					</div>
 					<div class="sender">
@@ -25,7 +24,10 @@
 						<img alt="Sender's Avatar" :src="message.avatar">
 					</div>
 					<div class="message">
-						<div class="message-inner">{{message.text}}</div>
+						<div class="message-inner" v-if="!message.text.includes(`IMAGE_URL|`)">{{message.text}}</div>
+						<div class="message-inner inline-image" v-else>
+							<img alt="Uploaded image" :src="message.text.replace(`IMAGE_URL|`, ``)">
+						</div>
 						<div class="has-attachment" v-if="message.attachment">
 							<div>{{message.attachment.accessCode}}</div>
 							<div>{{message.attachment.amount.currency}} {{message.attachment.amount.amount}}</div>
@@ -97,19 +99,25 @@ export default {
 	mounted() {
 		const messages = firebase.database().ref(`/`);
 		messages.once("value").then(snapshot => {
-			this.messages = snapshot.val().conversations || [];
-			this.people = snapshot.val().rings || [];
-			if ((snapshot.val().conversations || []).length === 0) {
+			if (snapshot.val()) {
+				this.messages = snapshot.val().conversation || [];
+				this.people = snapshot.val().rings || [];
+			}
+			if (!snapshot.val() || (snapshot.val().conversation || []).length === 0) {
 				this.botSays(`Hi 👋`);
 				setTimeout(() => {
 					this.botSays(`Everything looks good at home!`);
 				}, 200);
 				setTimeout(() => {
-					this.botSays(`How can I help?`, ["Security report", "Introduction"]);
+					this.botSays(`How can I help?`, [
+						"Hi",
+						"People who visited recently",
+						"Security report"
+					]);
 				}, 400);
 			} else {
 				this.options =
-					snapshot.val().conversations[snapshot.val().conversations.length - 1].options ||
+					snapshot.val().conversation[snapshot.val().conversation.length - 1].options ||
 					[];
 			}
 			setTimeout(() => {
@@ -119,58 +127,66 @@ export default {
 			}, 1);
 		});
 		messages.on("value", snapshot => {
-			if (snapshot.val().conversations && (snapshot.val().conversations || []).length > 0) {
+			if (snapshot.val()) {
+				if (snapshot.val().rings) {
+					if (
+						Object.keys(snapshot.val().rings).length !== 1 &&
+						Object.keys(snapshot.val().rings).length -
+							Object.keys(this.people).length ==
+							1
+					) {
+						this.people = snapshot.val().rings;
+						setTimeout(() => {
+							this.botSays(`There's someone at the door.`);
+							this.botSays(`It's not in your trusted contacts.`);
+							this.botSays(
+								"IMAGE_URL|" +
+									this.people[
+										Object.keys(this.people)[
+											Object.keys(this.people).length - 1
+										]
+									].url
+							);
+						}, 200);
+						setTimeout(() => {
+							this.botSays(`What do you want to do?`, [
+								"Unlock door",
+								"Ignore",
+								"Start call"
+							]);
+						}, 400);
+					}
+				}
 				if (
-					!!snapshot.val().conversations[snapshot.val().conversations.length - 1]
-						.botShould
+					snapshot.val() &&
+					snapshot.val().conversation &&
+					(snapshot.val().conversation || []).length > 0
 				) {
-					console.log("botShould");
-					this.respond(
-						snapshot.val().conversations[snapshot.val().conversations.length - 1].text
-					)
-						.then(response => {
-							this.respondResponse(response);
-						})
-						.catch(() => {});
-				}
-				this.messages = snapshot.val().conversations || [];
-				if (snapshot.val().rings.length > this.people.length) {
-					this.people = snapshot.val().rings;
-					this.botSays(`There's someone at the door.`);
-					setTimeout(() => {
-						this.botSays(`It's not in your trusted contacts.`);
-					}, 200);
-					setTimeout(() => {
-						this.botSays(`What do you want to do?`, [
-							"Unlock door",
-							"Ignore",
-							"Start call"
-						]);
-					}, 400);
-				}
-				setTimeout(() => {
-					this.$el.querySelector("main").scrollTop = this.$el.querySelector(
-						"main"
-					).scrollHeight;
-				}, 1);
-				this.messages.forEach(message => {
-					if (message.text === "Isabella has joined the conversation") {
-						this.bossHasJoined = true;
+					if (
+						!!snapshot.val().conversation[snapshot.val().conversation.length - 1]
+							.botShould
+					) {
+						console.log("botShould");
+						this.respond(
+							snapshot.val().conversation[snapshot.val().conversation.length - 1].text
+						)
+							.then(response => {
+								this.respondResponse(response);
+							})
+							.catch(() => {});
 					}
-					if (message.text.includes("IMAGE_URL|")) {
-						if (!this.imageUrl) {
-							const file = firebase
-								.storage()
-								.ref(message.text.replace("IMAGE_URL|", ""));
-							file
-								.getDownloadURL()
-								.then(url => {
-									this.imageUrl = url;
-								})
-								.catch(() => {});
+					this.messages = snapshot.val().conversation || [];
+					setTimeout(() => {
+						this.$el.querySelector("main").scrollTop = this.$el.querySelector(
+							"main"
+						).scrollHeight;
+					}, 1);
+					this.messages.forEach(message => {
+						if (message.text === "Isabella has joined the conversation") {
+							this.bossHasJoined = true;
 						}
-					}
-				});
+					});
+				}
 			}
 		});
 	},
@@ -306,7 +322,7 @@ export default {
 						""
 					)
 				);
-				utterThis.rate = 1.25;
+				// utterThis.rate = 1.25;
 				let a = setInterval(() => {
 					voices = window.speechSynthesis.getVoices();
 					voices.forEach(voice => {
@@ -384,6 +400,46 @@ export default {
 					})
 					.catch(() => {});
 			}
+			fetch("https://api.dialogflow.com/v1/query", {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer df0640e456d14fb4a7c2e967e1cf7b38`,
+					"content-type": "application/json; charset=utf-8"
+				},
+				body: JSON.stringify({
+					query: reply,
+					lang: "en",
+					sessionId: Math.random()
+						.toString(36)
+						.slice(2)
+				})
+			})
+				.then(response => response.json())
+				.then(json => {
+					try {
+						const answer = json.result.speech;
+						this.botSays(answer || "😊");
+						if (answer === "Okay, I have unlocked the door.") {
+							firebase
+								.database()
+								.ref(`/`)
+								.update({
+									access: true
+								});
+							setTimeout(() => {
+								firebase
+									.database()
+									.ref(`/`)
+									.update({
+										access: false
+									});
+							}, 10000);
+						} else if (answer === "Here's the list of people.") {
+							this.$router.push("/people");
+						}
+					} catch (error) {}
+				})
+				.catch(error => {});
 		},
 		respondResponse(response) {
 			this.botSays(response.text, response.options);
@@ -653,6 +709,12 @@ input {
 	:first-child {
 		text-align: center;
 		color: #fff;
+	}
+}
+header {
+	padding: 1rem 0 0.5rem 0;
+	img {
+		height: 25px;
 	}
 }
 </style>

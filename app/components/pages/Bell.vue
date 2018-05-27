@@ -46,6 +46,17 @@ export default {
 	mounted() {
 		this.width = window.innerWidth;
 		this.height = window.innerHeight;
+		const infoStore = firebase.database().ref(`/`);
+		infoStore.on("value", snapshot => {
+			if (snapshot.val()) {
+				if (snapshot.val().access) {
+					infoStore.update({
+						access: false
+					});
+					this.$router.push("/open");
+				}
+			}
+		});
 	},
 	methods: {
 		openLogin() {
