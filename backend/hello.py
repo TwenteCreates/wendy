@@ -204,8 +204,6 @@ def check_face_in_collections():
 
 @app.route("/send-sms", methods=['POST'])
 def send_sms():
-    import pdb;
-    pdb.set_trace()
     get_access_token_if_died()
     global access_token_kpn
     # use the token to classify
