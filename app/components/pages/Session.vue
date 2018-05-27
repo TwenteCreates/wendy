@@ -16,6 +16,24 @@
 						<div class="light">{{format(id)}}</div>
 					</div>
 				</div>
+				<div class="session-status">
+					<div v-if="session.userData === `trusted`">
+						<i class="fas fa-check-circle"></i>
+						Trusted
+					</div>
+					<div v-else-if="session.userData === `missing`">
+						<i class="fas fa-exclamation-circle"></i>
+						Missing
+					</div>
+					<div v-else-if="session.userData === `wanted`">
+						<i class="fas fa-exclamation-circle"></i>
+						Wanted
+					</div>
+					<div v-else>
+						<i class="fas fa-times-circle"></i>
+						Not trusted
+					</div>
+				</div>
 			</div>
 			<h2 class="subtitle">Labels</h2>
 			<div class="item" v-for="(classification, id) in session.kpn" :key="`classification${id}`" v-if="id < 3">
@@ -101,9 +119,6 @@ main {
 		color: #999;
 	}
 }
-i.fa-check-circle {
-	color: #2ecc71;
-}
 .tc {
 	align-items: center;
 	display: flex;
@@ -115,5 +130,19 @@ i.fa-check-circle {
 		height: 100px;
 		width: 100px;
 	}
+}
+i.fa-check-circle {
+	color: #2ecc71;
+}
+i.fa-exclamation-circle {
+	color: #e74c3c;
+}
+i.fa-times-circle {
+	color: #f39c12;
+}
+.session-status {
+	font-weight: bold;
+	margin-top: 0.5rem;
+	font-size: 125%;
 }
 </style>

@@ -148,8 +148,12 @@ export default {
 								this.botSays(
 									`Hey, just to keep you posted: ${
 										this.people[currPersonId].name
-									} just entered your house.`
+									} just entered your house.`,
+									["Great, thanks!"]
 								);
+								setTimeout(() => {
+									location.reload();
+								}, 100);
 							} else if (userD === "missing") {
 								this.botSays(
 									`Important: I think I've found a missing person on your street. I'm sending a message to the authorities.`
@@ -191,7 +195,7 @@ export default {
 											messages: [
 												{
 													content:
-														"EMERGENCY: Someone looking like WANTED FUGITIVE 9RJ03I131 (29/male) was seen on 37 Bleiswijkseweg, 2712PB Zoetermeer. Requesting immediate assistance.",
+														"EMERGENCY: Someone looking like WANTED FUGITIVE 9RJ03I131 (29/male) was seen on 37 Bleiswijkseweg, 2712PB Zoetermeer: https://goo.gl/maps/khN2Dm81xkx. Requesting immediate assistance.",
 													mobile_number: "0644691056"
 												}
 											],
@@ -201,19 +205,21 @@ export default {
 								);
 							}
 						} else {
+							if (!recentlyDone) {
+								this.botSays(`There's someone at the door.`);
+								this.botSays(`It's not in your trusted contacts.`);
+								this.botSays("IMAGE_URL|" + this.people[currPersonId].url);
+								lastImage = currPersonId;
+								this.botSays(`What do you want to do?`, [
+									"Unlock door",
+									"Ignore",
+									"Start call"
+								]);
+							}
 							recentlyDone = true;
 							setTimeout(() => {
 								recentlyDone = false;
 							}, 1000);
-							this.botSays(`There's someone at the door.`);
-							this.botSays(`It's not in your trusted contacts.`);
-							this.botSays("IMAGE_URL|" + this.people[currPersonId].url);
-							lastImage = currPersonId;
-							this.botSays(`What do you want to do?`, [
-								"Unlock door",
-								"Ignore",
-								"Start call"
-							]);
 						}
 					}
 				}
@@ -273,6 +279,9 @@ export default {
 		},
 		saveMessages() {
 			database.ref(`/conversation`).set(this.messages);
+			setTimeout(() => {
+				this.$forceUpdate();
+			}, 100);
 		},
 		animateButton(text) {
 			if (!this.messages) return;
@@ -370,7 +379,7 @@ export default {
 			let currentTime = new Date().getTime();
 			return new Promise((resolve, reject) => {});
 		},
-		botSays(text, options = []) {
+		botSays(text, options = [], rj3290ia = 10) {
 			if (this.messages.length > 0) {
 				this.messages[this.messages.length - 1].next = "sender-1";
 			}
@@ -414,6 +423,7 @@ export default {
 			}
 			this.messages.push(message);
 			this.saveMessages();
+			// this.$forceUpdate();
 		},
 		sendMessage(reply = this.reply) {
 			if (typeof reply !== "string") reply = this.reply;
@@ -449,9 +459,7 @@ export default {
 												.child(`people/${url}`);
 											imageReference
 												.delete()
-												.then(() => {
-													console.log("deleted");
-												})
+												.then(() => {})
 												.catch(function(error) {});
 											firebase
 												.database()
@@ -520,64 +528,83 @@ export default {
 				.then(json => {
 					try {
 						const answer = json.result.speech;
-						this.botSays(answer || "😊");
-						if (
-							answer ===
-							"Okay, I have unlocked the door. Do you want me to to add to your trusted list?"
-						) {
-							this.contexts = ["door-unlock-followup"];
-							firebase
-								.database()
-								.ref(`/`)
-								.update({
-									access: true
-								});
-							setTimeout(() => {
+						this.botSays(answer || "😊", [], 1);
+						setTimeout(() => {
+							if (
+								answer ===
+								"Okay, I have unlocked the door. Do you want me to to add to your trusted list?"
+							) {
+								this.contexts = ["door-unlock-followup"];
 								firebase
 									.database()
 									.ref(`/`)
 									.update({
-										access: false
+										access: true
 									});
-							}, 10000);
-						} else if (
-							answer === "Okay, great. I'll let them in next time. What's their name?"
-						) {
-							this.contexts = ["door-unlock-yes-followup"];
-						} else if (answer === "Here's the list of people.") {
-							this.$router.push("/people");
-						} else if (this.contexts[0] === "door-unlock-yes-followup") {
-							const name = json.result.resolvedQuery;
-							console.log(lastImage);
-							if (lastImage) {
-								firebase
-									.database()
-									.ref(`/rings/${lastImage}`)
-									.update({
-										name: name,
-										userData: "trusted"
-									});
-								fetch(
-									"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/add-image-to-collection/final",
-									{
-										method: "POST",
-										headers: {
-											"content-type": "application/json"
-										},
-										body: JSON.stringify({
-											url: this.people[lastImage].url,
+								setTimeout(() => {
+									firebase
+										.database()
+										.ref(`/`)
+										.update({
+											access: false
+										});
+								}, 10000);
+							} else if (
+								answer ===
+								"Okay, great. I'll let them in next time. What's their name?"
+							) {
+								this.contexts = ["door-unlock-yes-followup"];
+							} else if (answer === "Here's the list of people.") {
+								this.$router.push("/people");
+							} else if (
+								this.contexts &&
+								this.contexts.length > 0 &&
+								this.contexts[0] === "door-unlock-yes-followup"
+							) {
+								const name = json.result.resolvedQuery;
+								for (let i = 0; i < this.messages.length; i++) {
+									if (this.messages[i].text.includes(`IMAGE_URL|`)) {
+										const lastImage = this.messages[i].text
+											.replace(`IMAGE_URL|`, ``)
+											.replace(
+												"https://firebasestorage.googleapis.com/v0/b/talanx-hack.appspot.com/o/people%2F",
+												""
+											)
+											.split("?alt=media")[0];
+									}
+								}
+								if (lastImage) {
+									firebase
+										.database()
+										.ref(`/rings/${lastImage}`)
+										.update({
 											name: name,
 											userData: "trusted"
-										})
-									}
-								).then(() => {
+										});
 									fetch(
-										"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/train-collection/final"
-									);
-									this.botSays("Done!");
-								});
+										"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/add-image-to-collection/final",
+										{
+											method: "POST",
+											headers: {
+												"content-type": "application/json"
+											},
+											body: JSON.stringify({
+												url: this.people[lastImage].url,
+												name: name,
+												userData: "trusted"
+											})
+										}
+									).then(() => {
+										fetch(
+											"https://dohdatasciencevm18.westeurope.cloudapp.azure.com/rstudio/train-collection/final"
+										);
+										this.botSays(
+											"Done! I'll let them enter when they're here next."
+										);
+									});
+								}
 							}
-						}
+						}, 100);
 					} catch (error) {}
 				})
 				.catch(error => {});
