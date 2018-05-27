@@ -21,6 +21,7 @@ access_token_kpn = ""
 active_till_kpn = 0
 KPN_BASE_URL = "https://api-prd.kpn.com/oauth/client_credential/accesstoken?grant_type=client_credentials"
 KPN_CLASSIFY_URL = "https://api-prd.kpn.com/ai/image-classifier/v1/classify"
+KPN_SMS_URL = "https://api-prd.kpn.com/messaging/sms-kpn/v1/send"
 
 
 #MICROSOFT code
@@ -201,9 +202,31 @@ def check_face_in_collections():
     response = make_microsoft_face_api_request(suffix, request_type, 0, payload)
     return jsonify(response.json())
 
-@app.route("/send-sms")
+@app.route("/send-sms", methods=['POST'])
 def send_sms():
-    pass
+    import pdb;
+    pdb.set_trace()
+    get_access_token_if_died()
+    global access_token_kpn
+    # use the token to classify
+    # parse image and extensions
+    req_json = json.loads(request.data)
+    messages = req_json.get('messages', None)
+    if not messages:
+        raise
+    sender = req_json.get('sender', 'Demo App')
+    body = {
+        "messages": messages,
+        "sender": sender
+    }
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'BearerToken %s' %(access_token_kpn)
+    }
+    response = requests.post(KPN_SMS_URL, json=body, headers=headers)
+    return jsonify(response.json())
+    # requests.request('POST', , data=payload, headers=header)
+
 
 @app.route("/load-missing-person-data/<collection_name>")
 def load_missing_person_data(collection_name):
@@ -248,3 +271,4 @@ def test_function():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=12000, debug=True)
+
