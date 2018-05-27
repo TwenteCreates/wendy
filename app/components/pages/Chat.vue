@@ -643,6 +643,10 @@ main {
 		opacity: 0.75;
 	}
 }
+.agastya--night .message .message-inner {
+	background-color: #000;
+	box-shadow: 0 0.5rem 1rem rgba(255, 255, 255, 0.2);
+}
 @keyframes pulse {
 	0% {
 		transform: translateY(0);

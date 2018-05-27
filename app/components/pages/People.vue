@@ -75,6 +75,10 @@ export default {
 main {
 	padding: 1rem;
 }
+.agastya--night .item {
+	background-color: #000;
+	box-shadow: 0 0.5rem 1rem rgba(255, 255, 255, 0.2);
+}
 .item {
 	background-color: #ffffff;
 	padding: 0.75rem 1rem;

@@ -5,6 +5,7 @@ import Chat from "../components/pages/Chat.vue";
 import Bell from "../components/pages/Bell.vue";
 import People from "../components/pages/People.vue";
 import Session from "../components/pages/Session.vue";
+import Menu from "../components/pages/Menu.vue";
 import Open from "../components/pages/Open.vue";
 import Error404 from "../components/pages/Error404.vue";
 
@@ -24,6 +25,10 @@ const routes = [
 	{
 		path: "/session/:id",
 		component: Session
+	},
+	{
+		path: "/menu",
+		component: Menu
 	},
 	{
 		path: "/open",
