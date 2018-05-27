@@ -1,7 +1,7 @@
 <template>
 	<section>
 		<header>
-			Wendy
+			<img alt="Wendy" src="/text.png">
 		</header>
 		<main class="main-chat">
 			<div v-for="(message, index) in messages" :key="`message${index}`" v-bind:class="`message-block ${message.sender} next-${message.next || 'none'} previous-${message.previous || 'none'} class-${message.class || 'none'}`">
@@ -709,6 +709,12 @@ input {
 	:first-child {
 		text-align: center;
 		color: #fff;
+	}
+}
+header {
+	padding: 1rem 0 0.5rem 0;
+	img {
+		height: 25px;
 	}
 }
 </style>
