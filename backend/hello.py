@@ -212,7 +212,7 @@ def send_sms():
     messages = req_json.get('messages', None)
     if not messages:
         raise
-    sender = req_json.get('sender', 'Demo App')
+    sender = req_json.get('sender', 'Wendy')
     body = {
         "messages": messages,
         "sender": sender
