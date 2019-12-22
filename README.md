@@ -30,6 +30,10 @@ npm run generate
 
 For the backend, simply run the `hello.py` file using Python from the `backend` folder.
 
+## 👥 Contributors
+
+[![Profile pictures of contributors on GitHub](https://services.anandchowdhary.now.sh/api/github-contributors?repo=c-r-e-a-t-e/wendy)](https://github.com/c-r-e-a-t-e/wendy/graphs/contributors)
+
 ## 📄 License
 
 - Code: [MIT](/LICENSE)
